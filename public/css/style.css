@@ -154,7 +154,7 @@ body {
 
 @media (max-width: 480px) {
   #map {
-    height: 250px; /* Further reduce height for mobile screens */
+    height: 250px; 
   }
 }
 
@@ -175,7 +175,7 @@ body {
   padding: 10px;
   gap: 1rem;
   scrollbar-width: none;
-  flex-grow: 1; /* Allows filters to take up remaining space */
+  flex-grow: 1; 
 }
 
 #filters::-webkit-scrollbar {
@@ -183,7 +183,7 @@ body {
 }
 
 .filter {
-  flex: 0 0 auto; /* Prevent shrinking */
+  flex: 0 0 auto;
   text-align: center;
   opacity: 0.7;
   padding: 10px;
