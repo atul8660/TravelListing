@@ -48,4 +48,8 @@ router.get(
   wrapAsync(listingController.renderEditFrom)
 );
 
+router.get("/category/:category", wrapAsync(listingController.filterListing));
+
+router.get("/search/filter", wrapAsync(listingController.searchListing));
+
 module.exports = router;

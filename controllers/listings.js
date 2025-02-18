@@ -85,3 +85,37 @@ module.exports.destroyListing = async (req, res) => {
   req.flash("success", "Listing Deleted!");
   res.redirect("/listings");
 };
+
+module.exports.filterListing = async (req, res) => {
+  const { category } = req.params;
+  const listingsByCategory = await Listing.find({ category: category });
+  if (listingsByCategory.length > 0) {
+    res.render("listings/index.ejs", { allListing: listingsByCategory });
+  } else {
+    req.flash("error", "No listings found for this category.");
+    res.redirect("/listings");
+  }
+};
+
+module.exports.searchListing = async (req, res) => {
+  const searchTerm = req.query.query;
+  if (searchTerm) {
+    // Search listings with title, description, or location matching the search term
+    let results = await Listing.find({
+      $or: [
+        { title: { $regex: searchTerm, $options: "i" } },
+        { description: { $regex: searchTerm, $options: "i" } },
+        { location: { $regex: searchTerm, $options: "i" } },
+      ],
+    });
+    if (results == "") {
+      req.flash("error", "No listings found.");
+      res.redirect("/listings");
+    } else {
+      res.render("listings/index.ejs", { allListing: results });
+    }
+  } else {
+    req.flash("error", "Please enter a search term.");
+    res.redirect("/listings");
+  }
+};
