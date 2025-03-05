@@ -1,6 +1,6 @@
 # ✨ **WanderLust**
 
-WanderLust is a travel listing web application built with the MERN stack. It allows users to explore travel destinations, manage listings, leave reviews, and more, while featuring a clean, responsive design and  functionality.
+WanderLust is a travel listing web application built with the Node.js, Express.js, MongoDB, and EJS for templating. It allows users to explore travel destinations, manage listings, leave reviews, and more, while featuring a clean, responsive design and  functionality.
 
 ---
 
