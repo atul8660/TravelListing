@@ -1,15 +1,19 @@
-mapboxgl.accessToken = mapToken;
-const map = new mapboxgl.Map({
-  container: "map", // container ID
-  center: listing.geometry.coordinates, // starting position [lng, lat]. Note that lat must be set between -90 and 90
-  zoom: 9, // starting zoom
-});
+// Initialize Leaflet map with OpenStreetMap
+const map = L.map("map").setView(
+  [listing.geometry.coordinates[1], listing.geometry.coordinates[0]],
+  9
+);
 
-const marker1 = new mapboxgl.Marker({ color: "red" })
-  .setLngLat(listing.geometry.coordinates) //Listing.geometry.coordinate
-  .setPopup(
-    new mapboxgl.Popup({ offset: 25 }).setHTML(
-      `<h4>${listing.title}</h4><p>Exact Location will be provided after booking</p>`
-    )
+// Add OpenStreetMap tiles
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: "© OpenStreetMap contributors",
+}).addTo(map);
+
+// Add marker with popup
+L.marker([listing.geometry.coordinates[1], listing.geometry.coordinates[0]])
+  .bindPopup(
+    `<b>${listing.title}</b><br><p>Exact Location will be provided after booking</p>`
   )
-  .addTo(map);
+  .addTo(map)
+  .openPopup();

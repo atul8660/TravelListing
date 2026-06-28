@@ -1,7 +1,33 @@
 const Listing = require("../models/listing");
-const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
-const mapToken = process.env.MAP_TOKEN;
-const geocodingClient = mbxGeocoding({ accessToken: mapToken });
+const axios = require("axios");
+
+// Nominatim geocoding from OpenStreetMap (free, no API key needed)
+const geocodeLocation = async (location) => {
+  try {
+    const response = await axios.get("https://nominatim.openstreetmap.org/search", {
+      params: {
+        q: location,
+        format: "json",
+        limit: 1,
+      },
+      headers: {
+        "User-Agent": "WanderLust-App",
+      },
+    });
+    
+    if (response.data.length > 0) {
+      const result = response.data[0];
+      return {
+        type: "Point",
+        coordinates: [parseFloat(result.lon), parseFloat(result.lat)],
+      };
+    }
+    throw new Error("Location not found");
+  } catch (error) {
+    console.error("Geocoding error:", error.message);
+    throw error;
+  }
+};
 
 module.exports.index = async (req, res) => {
   const allListing = await Listing.find({});
@@ -30,20 +56,14 @@ module.exports.showListing = async (req, res) => {
 };
 
 module.exports.createListing = async (req, res, next) => {
-  let response = await geocodingClient
-    .forwardGeocode({
-      query: req.body.listing.location,
-      limit: 1,
-    })
-    .send();
+  const geometry = await geocodeLocation(req.body.listing.location);
 
   let url = req.file.path;
   let filename = req.file.filename;
   const newListing = new Listing(req.body.listing);
   newListing.owner = req.user._id;
   newListing.image = { url, filename };
-
-  newListing.geometry = response.body.features[0].geometry;
+  newListing.geometry = geometry;
 
   await newListing.save();
   req.flash("success", "New Listing Created!");
