@@ -48,10 +48,12 @@ module.exports.showListing = async (req, res) => {
       },
     })
     .populate("owner");
+    
   if (!listing) {
     req.flash("error", "Listing does not exist!");
     return res.redirect("/listings");
   }
+  
   res.render("listings/show.ejs", { listing });
 };
 
@@ -61,7 +63,7 @@ module.exports.createListing = async (req, res, next) => {
   let url = req.file.path;
   let filename = req.file.filename;
   const newListing = new Listing(req.body.listing);
-  newListing.owner = req.user._id;
+  newListing.owner = req.user._id; // Saves the logged-in user's ID
   newListing.image = { url, filename };
   newListing.geometry = geometry;
 
@@ -120,7 +122,6 @@ module.exports.filterListing = async (req, res) => {
 module.exports.searchListing = async (req, res) => {
   const searchTerm = req.query.query;
   if (searchTerm) {
-    // Search listings with title, description, or location matching the search term
     let results = await Listing.find({
       $or: [
         { title: { $regex: searchTerm, $options: "i" } },
