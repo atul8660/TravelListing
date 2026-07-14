@@ -49,7 +49,7 @@ const store = MongoStore.create({
   touchAfter: 24 * 3600,
 });
 
-store.on("error", () => {
+store.on("error", (err) => {
   console.log("ERROR in MONGO SESSION STORE ", err);
 });
 
@@ -64,10 +64,6 @@ const sessionOptions = {
     httpOnly: true,
   },
 };
-
- app.get("/", (req, res) => {
-  res.redirect("/listings");
-});
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -86,9 +82,18 @@ app.use((req, res, next) => {
   next();
 });
 
+// --- ROUTES ---
+
+// Root route redirects to listings (Sessions & Passports are fully available here)
+app.get("/", (req, res) => {
+  res.redirect("/listings");
+});
+
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
+
+// --- ERROR HANDLERS ---
 
 app.all("*", (req, res, next) => {
   next(new ExpressError(404, "Page Not Found!"));
@@ -96,14 +101,9 @@ app.all("*", (req, res, next) => {
 
 app.use((err, req, res, next) => {
   let { statusCode = 500, message = "Something went wrong!" } = err;
-  //res.status(statusCode).send(message);
   res.status(statusCode).render("listings/error.ejs", { message });
 });
 
 app.listen(8080, () => {
   console.log("Listening on port 8080");
-});
-
-app.get("/", (req, res) => {
-  res.redirect("/listings");
 });
