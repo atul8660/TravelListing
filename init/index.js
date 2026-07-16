@@ -5,6 +5,7 @@ if (process.env.NODE_ENV != "production") {
 const mongoose = require("mongoose");
 const initData = require("./data.js");
 const Listing = require("../models/listing.js");
+const User = require("../models/user.js");
 
 const mongo_url = process.env.ATLASDB_URL;
 
@@ -22,12 +23,17 @@ async function main() {
 
 const initDB = async () => {
   await Listing.deleteMany({});
+  await User.deleteMany({});
+  const newUser = new User({ email: "admin@wanderlust.com", username: "admin" });
+  const registeredUser = await User.register(newUser, "admin123");
+
   initData.data = initData.data.map((obj) => ({
     ...obj,
-    owner: "6797935ae6d3388c9e48370c",
+    owner: registeredUser._id,
   }));
   await Listing.insertMany(initData.data);
   console.log("Data was initialized");
+  process.exit(0);
 };
 
 initDB();
